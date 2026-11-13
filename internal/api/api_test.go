@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
@@ -183,6 +184,32 @@ func TestAccountsReportInvariantTotal(t *testing.T) {
 	missing := f.do(http.MethodGet, "/accounts/00000000-0000-0000-0000-000000000000", "", nil)
 	if missing.Code != http.StatusNotFound {
 		t.Fatalf("GET unknown account status = %d, want 404", missing.Code)
+	}
+}
+
+func TestDashboardServedAtRoot(t *testing.T) {
+	f := newFixture(t)
+	rec := f.do(http.MethodGet, "/", "", nil)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("GET / status = %d, want 200", rec.Code)
+	}
+	if ct := rec.Header().Get("Content-Type"); !strings.HasPrefix(ct, "text/html") {
+		t.Fatalf("GET / Content-Type = %q, want text/html", ct)
+	}
+	body := rec.Body.String()
+	for _, want := range []string{
+		"Groundhog Guard",
+		"Send it twice. Process it once.",
+		"Duplicate Storm",
+		"Shuffle",
+		"Poison Pill",
+		"Hurricane",
+		"Send the SAME request again",
+		"/stats", "/accounts", "/dlq", "/chaos/",
+	} {
+		if !strings.Contains(body, want) {
+			t.Errorf("dashboard body missing %q", want)
+		}
 	}
 }
 

@@ -1,4 +1,4 @@
-// Package api is the HTTP surface of OnceOnly: ingest with idempotency
+// Package api is the HTTP surface of Groundhog Guard: ingest with idempotency
 // keys, account/transfer queries, stats, DLQ inspection + replay, and
 // the chaos triggers. Handlers are thin adapters over internal/service.
 package api
@@ -12,11 +12,11 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	"github.com/Sravanthipanga/onceonly/internal/chaos"
-	"github.com/Sravanthipanga/onceonly/internal/domain"
-	"github.com/Sravanthipanga/onceonly/internal/metrics"
-	"github.com/Sravanthipanga/onceonly/internal/service"
-	"github.com/Sravanthipanga/onceonly/internal/store"
+	"github.com/Sravanthipanga/groundhog-guard/internal/chaos"
+	"github.com/Sravanthipanga/groundhog-guard/internal/domain"
+	"github.com/Sravanthipanga/groundhog-guard/internal/metrics"
+	"github.com/Sravanthipanga/groundhog-guard/internal/service"
+	"github.com/Sravanthipanga/groundhog-guard/internal/store"
 )
 
 // Server wires the service + chaos runner into an http.Handler.

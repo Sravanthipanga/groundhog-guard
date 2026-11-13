@@ -1,4 +1,4 @@
-module github.com/Sravanthipanga/onceonly
+module github.com/Sravanthipanga/groundhog-guard
 
 go 1.27.4
 

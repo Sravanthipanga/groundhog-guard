@@ -1,10 +1,12 @@
-# OnceOnly — Idempotent Event Processing System
+# Groundhog Guard — Idempotent Event Processing System
 
 ### Send it twice. Process it once. Sleep at night.
 
+🦫 *Same event again? And again? And again?* Like the movie — except the Guard remembers every event it has ever seen, and it only ever lets each one through **once**.
+
 Networks retry. Producers double-fire. Relays crash *after* publishing but *before* marking. Kafka, like every honest broker, delivers **at-least-once** — which means your consumer **will** see the same event twice, and in a payment system one duplicate is a customer charged twice.
 
-"Exactly-once delivery" is marketing. What actually saves you is an **idempotent consumer**, and OnceOnly is a complete, runnable demonstration of every layer of that defence — with money on the line so correctness is *provable*: a mini payment ledger where the total money in the system must never change, and no transfer may ever apply twice. A built-in **chaos generator** spends its life trying to break that invariant. It can't.
+"Exactly-once delivery" is marketing. What actually saves you is an **idempotent consumer**, and Groundhog Guard is a complete, runnable demonstration of every layer of that defence — with money on the line so correctness is *provable*: a mini payment ledger where the total money in the system must never change, and no transfer may ever apply twice. A built-in **chaos generator** spends its life trying to break that invariant. It can't.
 
 Built with **Go**, **Kafka** (franz-go), **PostgreSQL 17**, and **Valkey**.
 
@@ -13,14 +15,14 @@ Built with **Go**, **Kafka** (franz-go), **PostgreSQL 17**, and **Valkey**.
 ## Architecture
 
 ```
-                ┌───────────────────────────── onceonly api ─────────────────────────────┐
+                ┌───────────────────────────── groundhog api ─────────────────────────────┐
                 │  POST /transfers                                                     │
  Producer ──────┤    Idempotency-Key header ──► [1] API IDEMPOTENCY                    │
                 │         │                                                            │
                 │         └── ONE Postgres transaction: transfer row + OUTBOX event    │
                 └──────────────────────────────┬─────────────────────────────────────────┘
                                                │  [2] TRANSACTIONAL OUTBOX
-                                  onceonly relay (FOR UPDATE SKIP LOCKED,
+                                  groundhog relay (FOR UPDATE SKIP LOCKED,
                                   publish → mark, at-least-once by design)
                                                │
                                                ▼
@@ -28,7 +30,7 @@ Built with **Go**, **Kafka** (franz-go), **PostgreSQL 17**, and **Valkey**.
                                   (key = from_account → per-account ordering)
                                                │
                                                ▼
-                ┌──────────────────────────── onceonly consumer ─────────────────────────┐
+                ┌──────────────────────────── groundhog consumer ─────────────────────────┐
                 │  [3] DEDUP GATE                                                        │
                 │    a. Valkey fast path — "processed:{event_id}", written ONLY          │
                 │       after the Postgres commit (a hit is trustworthy)                 │
@@ -66,7 +68,7 @@ One Go binary, subcommands per role: `api` · `relay` · `consumer` · `seed` ·
 
 ## The Chaos Simulator 🔥
 
-`onceonly chaos <mode> [count]`, or `POST /chaos/{mode}`. Two honestly-distinguished entry points: transfers are created **through the ingest path** (idempotency keys, outbox, relay — the real thing), while extra copies are **raw-published** straight to the topic with pre-built events, simulating blind producer retries and crash-republishing relays. The duplicates are real duplicates: same `event_id`, same payload.
+`groundhog chaos <mode> [count]`, or `POST /chaos/{mode}`. Two honestly-distinguished entry points: transfers are created **through the ingest path** (idempotency keys, outbox, relay — the real thing), while extra copies are **raw-published** straight to the topic with pre-built events, simulating blind producer retries and crash-republishing relays. The duplicates are real duplicates: same `event_id`, same payload.
 
 | Mode | Attack | Expected result |
 |---|---|---|
@@ -88,7 +90,7 @@ docker compose up --build        # Kafka, Postgres, Valkey, api, relay, consumer
 Seed the demo accounts (6 accounts, **139,150,000 cents** total — the invariant):
 
 ```bash
-docker compose exec api onceonly seed
+docker compose exec api groundhog seed
 ```
 
 Make a transfer (note the idempotency key):
@@ -110,22 +112,22 @@ curl -s -X POST localhost:8080/transfers \
 Attack it, then watch the scoreboard:
 
 ```bash
-docker compose exec api onceonly chaos duplicate-storm 100
+docker compose exec api groundhog chaos duplicate-storm 100
 curl -s localhost:8080/stats
 # expected shape (exact numbers depend on what else you've run):
 # {"events_received":101,"duplicates_dropped":100,"transfers_applied":1,
 #  "dlq_count":0,"outbox_pending":0}
 
-docker compose exec api onceonly chaos poison
+docker compose exec api groundhog chaos poison
 curl -s localhost:8080/dlq                       # the poisoned event, attempts: 3
 EVENT_ID=$(curl -s localhost:8080/dlq | python3 -c 'import json,sys; print(json.load(sys.stdin)["entries"][0]["event_id"])')
 curl -s -X POST localhost:8080/dlq/$EVENT_ID/replay   # fix applied, republished…
 curl -s localhost:8080/stats                          # …and applied exactly once
 ```
 
-Grafana: <http://localhost:3000> (admin/admin) → dashboard **“OnceOnly — Idempotent Event Processing”**. Prometheus: <http://localhost:9090>.
+Grafana: <http://localhost:3000> (admin/admin) → dashboard **“Groundhog Guard — Idempotent Event Processing”**. Prometheus: <http://localhost:9090>.
 
-Running without Docker: install Postgres 17, Kafka, and Valkey/Redis locally, copy `.env.example` to `.env` (defaults already point at localhost), then run `go run ./cmd/onceonly seed|api|relay|consumer` in separate terminals.
+Running without Docker: install Postgres 17, Kafka, and Valkey/Redis locally, copy `.env.example` to `.env` (defaults already point at localhost), then run `go run ./cmd/groundhog seed|api|relay|consumer` in separate terminals.
 
 ---
 

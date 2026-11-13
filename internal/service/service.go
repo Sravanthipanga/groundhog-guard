@@ -8,12 +8,12 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Sravanthipanga/onceonly/internal/broker"
-	"github.com/Sravanthipanga/onceonly/internal/domain"
-	"github.com/Sravanthipanga/onceonly/internal/store"
+	"github.com/Sravanthipanga/groundhog-guard/internal/broker"
+	"github.com/Sravanthipanga/groundhog-guard/internal/domain"
+	"github.com/Sravanthipanga/groundhog-guard/internal/store"
 )
 
-// DemoAccounts are created by `onceonly seed`. Balances are cents
+// DemoAccounts are created by `groundhog seed`. Balances are cents
 // (₹1 = 100). Total: 139,150,000 cents — the invariant the whole
 // system exists to protect.
 var DemoAccounts = []struct {

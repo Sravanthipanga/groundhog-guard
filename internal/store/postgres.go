@@ -13,7 +13,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/Sravanthipanga/onceonly/internal/domain"
+	"github.com/Sravanthipanga/groundhog-guard/internal/domain"
 )
 
 //go:embed migrations/*.sql

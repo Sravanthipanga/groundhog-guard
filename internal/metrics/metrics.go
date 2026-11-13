@@ -1,5 +1,5 @@
 // Package metrics defines the Prometheus metrics exported by every
-// onceonly process. The consumer is the process that moves the ledger
+// groundhog process. The consumer is the process that moves the ledger
 // counters; other processes register them too (they simply stay at zero),
 // so Grafana sums across instances.
 package metrics
@@ -14,27 +14,27 @@ import (
 
 var (
 	EventsReceived = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "onceonly_events_received_total",
+		Name: "groundhog_events_received_total",
 		Help: "Event deliveries seen by the consumer (including duplicates).",
 	})
 	DuplicatesDropped = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "onceonly_duplicates_dropped_total",
+		Name: "groundhog_duplicates_dropped_total",
 		Help: "Deliveries dropped because the event was already processed.",
 	})
 	TransfersApplied = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "onceonly_transfers_applied_total",
+		Name: "groundhog_transfers_applied_total",
 		Help: "Transfers applied to the ledger (exactly once per event).",
 	})
 	DLQTotal = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "onceonly_dlq_total",
+		Name: "groundhog_dlq_total",
 		Help: "Events written to the dead letter queue.",
 	})
 	OutboxPending = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "onceonly_outbox_pending",
+		Name: "groundhog_outbox_pending",
 		Help: "Outbox rows not yet published to Kafka (set by the relay).",
 	})
 	HTTPRequests = promauto.NewCounterVec(prometheus.CounterOpts{
-		Name: "onceonly_http_requests_total",
+		Name: "groundhog_http_requests_total",
 		Help: "HTTP requests handled by the API, by route and status.",
 	}, []string{"route", "status"})
 )

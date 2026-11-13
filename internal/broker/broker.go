@@ -13,7 +13,7 @@ import (
 	"github.com/twmb/franz-go/pkg/kadm"
 	"github.com/twmb/franz-go/pkg/kgo"
 
-	"github.com/Sravanthipanga/onceonly/internal/domain"
+	"github.com/Sravanthipanga/groundhog-guard/internal/domain"
 )
 
 // Producer publishes events to Kafka. Implementations: FranzProducer

@@ -6,12 +6,12 @@ import (
 	"strings"
 )
 
-// Config is shared by all onceonly subcommands; each uses the parts it needs.
+// Config is shared by all groundhog subcommands; each uses the parts it needs.
 type Config struct {
-	DatabaseURL string   // pgx DSN, e.g. postgres://onceonly:onceonly@localhost:5432/onceonly
+	DatabaseURL string   // pgx DSN, e.g. postgres://groundhog:groundhog@localhost:5432/groundhog
 	ValkeyAddr  string   // host:port of Valkey/Redis
 	Brokers     []string // Kafka bootstrap brokers
-	HTTPAddr    string   // listen address for `onceonly api`
+	HTTPAddr    string   // listen address for `groundhog api`
 	MetricsAddr string   // listen address for the metrics server in relay/consumer
 	APIURL      string   // base URL of the API, used by the chaos CLI
 }
@@ -20,7 +20,7 @@ type Config struct {
 // binary also runs outside Docker against localhost services.
 func FromEnv() Config {
 	return Config{
-		DatabaseURL: getenv("DATABASE_URL", "postgres://onceonly:onceonly@localhost:5432/onceonly?sslmode=disable"),
+		DatabaseURL: getenv("DATABASE_URL", "postgres://groundhog:groundhog@localhost:5432/groundhog?sslmode=disable"),
 		ValkeyAddr:  getenv("VALKEY_ADDR", "localhost:6379"),
 		Brokers:     splitCSV(getenv("KAFKA_BROKERS", "localhost:9092")),
 		HTTPAddr:    getenv("HTTP_ADDR", ":8080"),

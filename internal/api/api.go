@@ -30,6 +30,7 @@ func New(svc *service.Service, chaosRunner *chaos.Runner) http.Handler {
 	s := &Server{svc: svc, chaos: chaosRunner}
 	r := chi.NewRouter()
 	r.Use(s.observe)
+	r.Get("/", s.dashboard)
 	r.Post("/transfers", s.createTransfer)
 	r.Get("/transfers/{id}", s.getTransfer)
 	r.Get("/accounts", s.listAccounts)

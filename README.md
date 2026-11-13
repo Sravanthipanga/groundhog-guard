@@ -131,6 +131,23 @@ Running without Docker: install Postgres 17, Kafka, and Valkey/Redis locally, co
 
 ---
 
+## Live dashboard 🦫
+
+The api process serves a single-page live dashboard at **<http://localhost:8080/>** — one embedded HTML file, all CSS/JS inline, no build step and no extra service to run. In the compose stack it's simply there when the api is up.
+
+What you get:
+
+- **Scoreboard** — events received, transfers applied, duplicates dropped, DLQ count, and outbox pending, polled from `GET /stats` every ~1.5s.
+- **Ledger accounts + the invariant, watched live** — balances from `GET /accounts`, with the total checked against the first total observed since page load. It stays green (`total money constant ✓`) through every storm; if it ever moved, the panel turns into a red alarm.
+- **The double-submit demo** — a transfer form (from/to, amount, reference) that generates a fresh Idempotency-Key, plus the amber **“↻ Send the SAME request again”** button, which re-sends the byte-identical request with the same key so you can watch the API answer `200` + `X-Idempotent-Replay: true` and return the *original* transfer. This is the whole product in one click.
+- **Chaos buttons** — 🌩️ Duplicate Storm, 🔀 Shuffle, ☠️ Poison Pill, and 🌀 Hurricane, each firing `POST /chaos/{mode}` with an adjustable count and logging the JSON summary.
+- **DLQ panel** — every dead-lettered event from `GET /dlq` (error, attempts) with a per-row **Replay** button wired to `POST /dlq/{event_id}/replay`.
+- An **activity log** narrating every call and response, so a demo audience can follow along without reading curl output.
+
+Honest verification note: this sandbox has no Docker/Postgres/Kafka, so the dashboard is covered by the API test suite (`GET /` → 200, `text/html`, key content present, and all the endpoints it consumes exercised end-to-end against the in-memory store) rather than by a live compose run here.
+
+---
+
 ## API reference
 
 | Endpoint | Description |

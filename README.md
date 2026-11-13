@@ -135,6 +135,9 @@ Running without Docker: install Postgres 17, Kafka, and Valkey/Redis locally, co
 
 The api process serves a single-page live dashboard at **<http://localhost:8080/>** — one embedded HTML file, all CSS/JS inline, no build step and no extra service to run. In the compose stack it's simply there when the api is up.
 
+![Groundhog Guard live dashboard](docs/dashboard.png)
+*The dashboard, shown with demo data: 412 events received, 391 duplicates dropped, the money total untouched.*
+
 What you get:
 
 - **Scoreboard** — events received, transfers applied, duplicates dropped, DLQ count, and outbox pending, polled from `GET /stats` every ~1.5s.

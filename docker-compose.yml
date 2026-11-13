@@ -1,0 +1,137 @@
+# OnceOnly — full stack in one command:  docker compose up --build
+#
+# Services: Kafka (KRaft) · Postgres 17 · Valkey · api · relay ·
+# consumer · Prometheus · Grafana (http://localhost:3000, admin/admin).
+#
+# Copy .env.example to .env to override ports/passwords.
+
+services:
+  kafka:
+    image: apache/kafka:3.9.0
+    ports:
+      - "9092:9092"          # EXTERNAL listener for host-side tools
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      # INTERNAL is for the compose network, EXTERNAL for the host.
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:29092,EXTERNAL://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:29092 --list"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  postgres:
+    image: postgres:17
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: onceonly
+      POSTGRES_PASSWORD: onceonly
+      POSTGRES_DB: onceonly
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U onceonly -d onceonly"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  valkey:
+    # Valkey is the community Redis fork; the app speaks the Redis
+    # protocol via go-redis. To use Redis instead, swap this image for
+    # redis:7 — nothing else changes.
+    image: valkey/valkey:8.0
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build: .
+    command: ["api"]
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: postgres://onceonly:onceonly@postgres:5432/onceonly?sslmode=disable
+      VALKEY_ADDR: valkey:6379
+      KAFKA_BROKERS: kafka:29092
+      HTTP_ADDR: ":8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+
+  relay:
+    build: .
+    command: ["relay"]
+    environment:
+      DATABASE_URL: postgres://onceonly:onceonly@postgres:5432/onceonly?sslmode=disable
+      VALKEY_ADDR: valkey:6379
+      KAFKA_BROKERS: kafka:29092
+      METRICS_ADDR: ":9092"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+
+  consumer:
+    build: .
+    command: ["consumer"]
+    environment:
+      DATABASE_URL: postgres://onceonly:onceonly@postgres:5432/onceonly?sslmode=disable
+      VALKEY_ADDR: valkey:6379
+      KAFKA_BROKERS: kafka:29092
+      METRICS_ADDR: ":9091"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      - api
+      - consumer
+      - relay
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+
+volumes:
+  pgdata:

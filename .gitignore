@@ -1,0 +1,3 @@
+/onceonly
+*.out
+.env

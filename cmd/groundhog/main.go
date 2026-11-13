@@ -1,13 +1,13 @@
-// OnceOnly — send it twice, process it once.
+// Groundhog Guard — send it twice, process it once.
 //
 // One binary, several subcommands, so Docker Compose can run each role
 // as its own service from a single image:
 //
-//	onceonly api       HTTP ingest + query + ops API
-//	onceonly relay     transactional-outbox relay (Postgres -> Kafka)
-//	onceonly consumer  Kafka consumer group applying transfers exactly once
-//	onceonly seed      create the demo accounts
-//	onceonly chaos     trigger a chaos mode via the API (thin HTTP client)
+//	groundhog api       HTTP ingest + query + ops API
+//	groundhog relay     transactional-outbox relay (Postgres -> Kafka)
+//	groundhog consumer  Kafka consumer group applying transfers exactly once
+//	groundhog seed      create the demo accounts
+//	groundhog chaos     trigger a chaos mode via the API (thin HTTP client)
 package main
 
 import (
@@ -24,17 +24,17 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Sravanthipanga/onceonly/internal/api"
-	"github.com/Sravanthipanga/onceonly/internal/broker"
-	"github.com/Sravanthipanga/onceonly/internal/chaos"
-	"github.com/Sravanthipanga/onceonly/internal/config"
-	"github.com/Sravanthipanga/onceonly/internal/consumer"
-	"github.com/Sravanthipanga/onceonly/internal/dedup"
-	"github.com/Sravanthipanga/onceonly/internal/ledger"
-	"github.com/Sravanthipanga/onceonly/internal/metrics"
-	"github.com/Sravanthipanga/onceonly/internal/relay"
-	"github.com/Sravanthipanga/onceonly/internal/service"
-	"github.com/Sravanthipanga/onceonly/internal/store"
+	"github.com/Sravanthipanga/groundhog-guard/internal/api"
+	"github.com/Sravanthipanga/groundhog-guard/internal/broker"
+	"github.com/Sravanthipanga/groundhog-guard/internal/chaos"
+	"github.com/Sravanthipanga/groundhog-guard/internal/config"
+	"github.com/Sravanthipanga/groundhog-guard/internal/consumer"
+	"github.com/Sravanthipanga/groundhog-guard/internal/dedup"
+	"github.com/Sravanthipanga/groundhog-guard/internal/ledger"
+	"github.com/Sravanthipanga/groundhog-guard/internal/metrics"
+	"github.com/Sravanthipanga/groundhog-guard/internal/relay"
+	"github.com/Sravanthipanga/groundhog-guard/internal/service"
+	"github.com/Sravanthipanga/groundhog-guard/internal/store"
 )
 
 func main() {
@@ -62,7 +62,7 @@ func main() {
 	case "chaos":
 		err = runChaosCLI(cfg)
 	case "version":
-		fmt.Println("onceonly dev")
+		fmt.Println("groundhog dev")
 	default:
 		usage()
 		os.Exit(2)
@@ -74,8 +74,8 @@ func main() {
 }
 
 func usage() {
-	fmt.Fprintln(os.Stderr, "usage: onceonly <api|relay|consumer|seed|chaos|version>")
-	fmt.Fprintln(os.Stderr, "  chaos usage: onceonly chaos <duplicate-storm|shuffle|poison|hurricane> [count]")
+	fmt.Fprintln(os.Stderr, "usage: groundhog <api|relay|consumer|seed|chaos|version>")
+	fmt.Fprintln(os.Stderr, "  chaos usage: groundhog chaos <duplicate-storm|shuffle|poison|hurricane> [count]")
 }
 
 // openStore connects to Postgres (with a short retry loop for compose

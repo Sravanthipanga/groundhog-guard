@@ -1,4 +1,4 @@
-// Package domain holds the shared types and sentinel errors for OnceOnly.
+// Package domain holds the shared types and sentinel errors for Groundhog Guard.
 package domain
 
 import (

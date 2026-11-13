@@ -22,11 +22,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Sravanthipanga/onceonly/internal/broker"
-	"github.com/Sravanthipanga/onceonly/internal/dedup"
-	"github.com/Sravanthipanga/onceonly/internal/domain"
-	"github.com/Sravanthipanga/onceonly/internal/metrics"
-	"github.com/Sravanthipanga/onceonly/internal/store"
+	"github.com/Sravanthipanga/groundhog-guard/internal/broker"
+	"github.com/Sravanthipanga/groundhog-guard/internal/dedup"
+	"github.com/Sravanthipanga/groundhog-guard/internal/domain"
+	"github.com/Sravanthipanga/groundhog-guard/internal/metrics"
+	"github.com/Sravanthipanga/groundhog-guard/internal/store"
 )
 
 // Processor handles single deliveries. It is safe for concurrent use:

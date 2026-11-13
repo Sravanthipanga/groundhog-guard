@@ -1,4 +1,4 @@
-// Package store defines the persistence contract for OnceOnly and two
+// Package store defines the persistence contract for Groundhog Guard and two
 // implementations: Postgres (production) and an in-memory store whose
 // semantics mirror the SQL exactly (used by the unit tests).
 package store
@@ -6,7 +6,7 @@ package store
 import (
 	"context"
 
-	"github.com/Sravanthipanga/onceonly/internal/domain"
+	"github.com/Sravanthipanga/groundhog-guard/internal/domain"
 )
 
 // Counter names kept in stats_counters.

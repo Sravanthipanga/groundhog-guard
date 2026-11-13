@@ -19,10 +19,10 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/Sravanthipanga/onceonly/internal/broker"
-	"github.com/Sravanthipanga/onceonly/internal/domain"
-	"github.com/Sravanthipanga/onceonly/internal/service"
-	"github.com/Sravanthipanga/onceonly/internal/store"
+	"github.com/Sravanthipanga/groundhog-guard/internal/broker"
+	"github.com/Sravanthipanga/groundhog-guard/internal/domain"
+	"github.com/Sravanthipanga/groundhog-guard/internal/service"
+	"github.com/Sravanthipanga/groundhog-guard/internal/store"
 )
 
 // Mode names accepted by POST /chaos/{mode} and the chaos CLI.
@@ -94,7 +94,7 @@ func (r *Runner) twoAccounts(ctx context.Context) (from, to domain.Account, err 
 		return from, to, err
 	}
 	if len(accounts) < 2 {
-		return from, to, fmt.Errorf("need at least 2 accounts — run `onceonly seed` first")
+		return from, to, fmt.Errorf("need at least 2 accounts — run `groundhog seed` first")
 	}
 	return accounts[0], accounts[1], nil
 }
@@ -144,7 +144,7 @@ func (r *Runner) shuffle(ctx context.Context, count int) (Summary, error) {
 		return Summary{}, err
 	}
 	if len(accounts) < 2 {
-		return Summary{}, fmt.Errorf("need at least 2 accounts — run `onceonly seed` first")
+		return Summary{}, fmt.Errorf("need at least 2 accounts — run `groundhog seed` first")
 	}
 	var events []domain.Event
 	for i := 0; i < count; i++ {
@@ -201,7 +201,7 @@ func (r *Runner) hurricane(ctx context.Context, count int) (Summary, error) {
 		return Summary{}, err
 	}
 	if len(accounts) < 2 {
-		return Summary{}, fmt.Errorf("need at least 2 accounts — run `onceonly seed` first")
+		return Summary{}, fmt.Errorf("need at least 2 accounts — run `groundhog seed` first")
 	}
 	var events []domain.Event
 	for i := 0; i < count; i++ {

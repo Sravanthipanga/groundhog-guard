@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/Sravanthipanga/onceonly/internal/service"
-	"github.com/Sravanthipanga/onceonly/internal/store"
+	"github.com/Sravanthipanga/groundhog-guard/internal/service"
+	"github.com/Sravanthipanga/groundhog-guard/internal/store"
 )
 
 func TestSeedIsIdempotentAndTotalIsConstant(t *testing.T) {

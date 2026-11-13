@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"sync"
 
-	"github.com/Sravanthipanga/onceonly/internal/domain"
+	"github.com/Sravanthipanga/groundhog-guard/internal/domain"
 )
 
 // RecordedMessage is one message captured by FakeProducer.

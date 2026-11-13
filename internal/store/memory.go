@@ -9,7 +9,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/Sravanthipanga/onceonly/internal/domain"
+	"github.com/Sravanthipanga/groundhog-guard/internal/domain"
 )
 
 // MemoryStore is an in-memory Store whose semantics mirror the Postgres

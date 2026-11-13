@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/Sravanthipanga/onceonly/internal/dedup"
+	"github.com/Sravanthipanga/groundhog-guard/internal/dedup"
 )
 
 func TestMemoryStoreSemantics(t *testing.T) {

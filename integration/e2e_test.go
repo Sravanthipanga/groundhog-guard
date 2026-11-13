@@ -20,14 +20,14 @@ import (
 	tcpostgres "github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
 
-	"github.com/Sravanthipanga/onceonly/internal/broker"
-	"github.com/Sravanthipanga/onceonly/internal/consumer"
-	"github.com/Sravanthipanga/onceonly/internal/dedup"
-	"github.com/Sravanthipanga/onceonly/internal/domain"
-	"github.com/Sravanthipanga/onceonly/internal/ledger"
-	"github.com/Sravanthipanga/onceonly/internal/relay"
-	"github.com/Sravanthipanga/onceonly/internal/service"
-	"github.com/Sravanthipanga/onceonly/internal/store"
+	"github.com/Sravanthipanga/groundhog-guard/internal/broker"
+	"github.com/Sravanthipanga/groundhog-guard/internal/consumer"
+	"github.com/Sravanthipanga/groundhog-guard/internal/dedup"
+	"github.com/Sravanthipanga/groundhog-guard/internal/domain"
+	"github.com/Sravanthipanga/groundhog-guard/internal/ledger"
+	"github.com/Sravanthipanga/groundhog-guard/internal/relay"
+	"github.com/Sravanthipanga/groundhog-guard/internal/service"
+	"github.com/Sravanthipanga/groundhog-guard/internal/store"
 )
 
 func startContainer(t *testing.T, ctx context.Context, req testcontainers.ContainerRequest) testcontainers.Container {
@@ -65,9 +65,9 @@ func TestEndToEndDuplicateStorm(t *testing.T) {
 
 	// --- Postgres 17 ---
 	pgContainer, err := tcpostgres.Run(ctx, "postgres:17",
-		tcpostgres.WithDatabase("onceonly"),
-		tcpostgres.WithUsername("onceonly"),
-		tcpostgres.WithPassword("onceonly"),
+		tcpostgres.WithDatabase("groundhog"),
+		tcpostgres.WithUsername("groundhog"),
+		tcpostgres.WithPassword("groundhog"),
 		testcontainers.WithWaitStrategy(
 			wait.ForLog("database system is ready to accept connections").
 				WithOccurrence(2).WithStartupTimeout(60*time.Second)),

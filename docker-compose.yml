@@ -1,4 +1,4 @@
-# OnceOnly — full stack in one command:  docker compose up --build
+# Groundhog Guard — full stack in one command:  docker compose up --build
 #
 # Services: Kafka (KRaft) · Postgres 17 · Valkey · api · relay ·
 # consumer · Prometheus · Grafana (http://localhost:3000, admin/admin).
@@ -36,13 +36,13 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: onceonly
-      POSTGRES_PASSWORD: onceonly
-      POSTGRES_DB: onceonly
+      POSTGRES_USER: groundhog
+      POSTGRES_PASSWORD: groundhog
+      POSTGRES_DB: groundhog
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U onceonly -d onceonly"]
+      test: ["CMD-SHELL", "pg_isready -U groundhog -d groundhog"]
       interval: 3s
       timeout: 3s
       retries: 20
@@ -66,7 +66,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      DATABASE_URL: postgres://onceonly:onceonly@postgres:5432/onceonly?sslmode=disable
+      DATABASE_URL: postgres://groundhog:groundhog@postgres:5432/groundhog?sslmode=disable
       VALKEY_ADDR: valkey:6379
       KAFKA_BROKERS: kafka:29092
       HTTP_ADDR: ":8080"
@@ -82,7 +82,7 @@ services:
     build: .
     command: ["relay"]
     environment:
-      DATABASE_URL: postgres://onceonly:onceonly@postgres:5432/onceonly?sslmode=disable
+      DATABASE_URL: postgres://groundhog:groundhog@postgres:5432/groundhog?sslmode=disable
       VALKEY_ADDR: valkey:6379
       KAFKA_BROKERS: kafka:29092
       METRICS_ADDR: ":9092"
@@ -96,7 +96,7 @@ services:
     build: .
     command: ["consumer"]
     environment:
-      DATABASE_URL: postgres://onceonly:onceonly@postgres:5432/onceonly?sslmode=disable
+      DATABASE_URL: postgres://groundhog:groundhog@postgres:5432/groundhog?sslmode=disable
       VALKEY_ADDR: valkey:6379
       KAFKA_BROKERS: kafka:29092
       METRICS_ADDR: ":9091"

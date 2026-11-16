@@ -197,7 +197,7 @@ The unit suite runs the whole pipeline against in-memory stores whose semantics 
 
 The integration test (testcontainers-go: apache/kafka + postgres:17 + valkey) drives the *real* relay and consumer group through a 51-delivery duplicate storm and asserts balances, counters, and the invariant. It **skips cleanly** when no Docker daemon is available.
 
-> **Verification note for this repo's history:** the project was authored in an environment *without* a Docker daemon, so the Compose stack and the integration test were verified by compilation (`go vet -tags integration ./...`), a clean runtime skip, and static config validation — the full-stack run itself was **not** executed there. The demo outputs above are labelled *expected* for that reason; on a Docker machine, `docker compose up` + the quickstart is the real proof, and the integration test will run for real. The unit suite's numbers, by contrast, are from actual runs: **18 tests, all passing** (including with `-race`).
+> **Verification note for this repo's history:** the project was authored in an environment *without* a Docker daemon, so the Compose stack and the integration test were verified by compilation (`go vet -tags integration ./...`), a clean runtime skip, and static config validation — the full-stack run itself was **not** executed there. The demo outputs above are labelled *expected* for that reason; on a Docker machine, `docker compose up` + the quickstart is the real proof, and the integration test will run for real. The unit suite's numbers, by contrast, are from actual runs: **19 unit tests, all passing** (including with `-race`), plus 1 integration test (20 total; the integration test runs only with Docker and otherwise skips cleanly).
 
 ## Future work
 
@@ -205,7 +205,7 @@ The integration test (testcontainers-go: apache/kafka + postgres:17 + valkey) dr
 - Schema registry (Avro/Protobuf) with producer-side validation — closes the non-UUID-id limit above.
 - Kafka-side poison handling via a retry topic with delayed redelivery instead of in-process backoff.
 - Outbox/processed-events retention jobs; partitioning `processed_events` by month.
-- A tiny live web UI over `/stats` for demos (Grafana already covers the metrics story).
+- _Shipped:_ the live web dashboard over `/stats` described above (it was previously listed here as future work).
 - Benchmarks: sustained throughput of the apply transaction, and dedup fast-path hit rates under different duplicate distributions.
 
 ## Tech

@@ -1,4 +1,5 @@
 # Groundhog Guard — Idempotent Event Processing System
+[![CI](https://github.com/Sravanthipanga/groundhog-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/Sravanthipanga/groundhog-guard/actions/workflows/ci.yml)
 
 ### Send it twice. Process it once. Sleep at night.
 
@@ -11,6 +12,19 @@ Networks retry. Producers double-fire. Relays crash *after* publishing but *befo
 Built with **Go**, **Kafka** (franz-go), **PostgreSQL 17**, and **Valkey**.
 
 ---
+
+## Architecture
+
+```mermaid
+flowchart LR
+    P[Producer] -->|POST with Idempotency-Key| ING[Ingest API]
+    ING --> PG[(PostgreSQL: ledger + transactional outbox)]
+    PG --> REL[Outbox relay]
+    REL --> K[(Kafka)]
+    K --> CON[Idempotent consumer: dedup gate]
+    CON --> LED[Ledger effect applied exactly once]
+    CON -.->|retries exhausted| DLQ[Dead letter queue + replay]
+```
 
 ## Architecture
 
